@@ -38,6 +38,13 @@ git push origin v1.1.1
 git push origin main --tags
 ```
 
+태그 설명까지 같이 넣고 싶으면(annotated tag):
+
+```bash
+git tag -a v1.1.1 -m "oh-my-copy v1.1.1"
+git push origin v1.1.1
+```
+
 ## 5. 자동 배포 결과
 
 태그 푸시 후 Actions가 다음을 수행합니다.
@@ -60,4 +67,27 @@ Antigravity:
 
 ```bash
 antigravity --install-extension ./oh-my-copy-v1.1.1.vsix
+```
+
+직접 다운로드 링크 공유 예시:
+
+```txt
+https://github.com/YeonKyuJeon/oh-my-copy/releases/download/v1.1.1/oh-my-copy-v1.1.1.vsix
+```
+
+## 7. Release Description 작성 방법
+
+태그 푸시로 Release가 생성된 뒤, GitHub Releases에서 설명을 편집합니다.
+
+1. `https://github.com/YeonKyuJeon/oh-my-copy/releases` 이동
+2. 해당 버전 `Edit` 클릭
+3. `RELEASE_DESCRIPTION_TEMPLATE.md` 내용을 붙여넣고 버전 값만 교체
+4. 저장
+
+CLI로 업데이트하려면:
+
+```bash
+gh release edit v1.1.1 \
+  --title "oh-my-copy v1.1.1" \
+  --notes-file RELEASE_DESCRIPTION_TEMPLATE.md
 ```

@@ -17,6 +17,18 @@ bun run package
 
 빌드 후 루트에 `oh-my-copy-<version>.vsix` 파일이 생성됩니다.
 
+외부 사용자에게 공유할 때는 아래 URL 패턴을 그대로 전달하면 됩니다.
+
+```txt
+https://github.com/YeonKyuJeon/oh-my-copy/releases/download/v<version>/oh-my-copy-v<version>.vsix
+```
+
+예:
+
+```txt
+https://github.com/YeonKyuJeon/oh-my-copy/releases/download/v1.1.1/oh-my-copy-v1.1.1.vsix
+```
+
 ## 2. GUI로 설치
 
 ### VS Code
@@ -86,6 +98,13 @@ antigravity --uninstall-extension oh-my-copy.oh-my-copy
 2. 코드 선택 후 단축키 실행
    - macOS: `ctrl+cmd+alt+c`
    - Windows/Linux: `ctrl+alt+c`
+3. 외부 도구(Codex CLI 등)에 붙여넣기
+
+출력 예시:
+
+```txt
+### src/components/Button.tsx:42-45 `const handleClick = () => { // ... }`
+```
 
 ## 7. 팀 공유 권장 방식
 

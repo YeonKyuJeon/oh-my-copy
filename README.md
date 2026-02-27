@@ -24,6 +24,29 @@ For Antigravity:
 antigravity --install-extension ./oh-my-copy-<version>.vsix
 ```
 
+## Quick Start (External Users)
+
+1. 릴리즈 페이지에서 최신 `.vsix` 파일 다운로드
+2. 에디터에 확장 설치
+3. 코드 선택 후 단축키 실행
+4. 원하는 CLI/채팅 도구에 붙여넣기
+
+```bash
+# VS Code
+code --install-extension ./oh-my-copy-v1.1.1.vsix
+
+# Antigravity
+antigravity --install-extension ./oh-my-copy-v1.1.1.vsix
+```
+
+사용 방법:
+
+1. 파일에서 코드 블록을 선택
+2. 단축키 실행
+   - macOS: `ctrl+cmd+alt+c`
+   - Windows/Linux: `ctrl+alt+c`
+3. 복사된 문자열을 Codex CLI 등에 붙여넣기
+
 ## Default Output
 
 ```txt
@@ -90,3 +113,4 @@ bun run package
 ## Release (Maintainers)
 
 - [RELEASE.md](./RELEASE.md)
+- [RELEASE_DESCRIPTION_TEMPLATE.md](./RELEASE_DESCRIPTION_TEMPLATE.md)
