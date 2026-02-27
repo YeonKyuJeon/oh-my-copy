@@ -68,8 +68,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/oh-my-copy.git"
+    "url": "https://github.com/YeonKyuJeon/oh-my-copy.git"
   },
+  "homepage": "https://github.com/YeonKyuJeon/oh-my-copy#readme",
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
