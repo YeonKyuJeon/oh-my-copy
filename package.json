@@ -1,0 +1,84 @@
+{
+  "name": "oh-my-copy",
+  "displayName": "oh-my-copy",
+  "description": "Copy selected code with file and line context for Codex CLI",
+  "version": "0.1.0",
+  "publisher": "oh-my-copy",
+  "engines": {
+    "vscode": "^1.109.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:oh-my-copy.copyWithContext"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "oh-my-copy.copyWithContext",
+        "title": "Copy With Context",
+        "category": "Oh My Copy"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "oh-my-copy.copyWithContext",
+        "key": "ctrl+alt+c",
+        "mac": "ctrl+cmd+c",
+        "when": "editorTextFocus && editorHasSelection && !terminalFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Oh My Copy",
+      "properties": {
+        "ohMyCopy.outputTemplate": {
+          "type": "string",
+          "default": "### {file}:{lines}\\n\\n{code}\\n",
+          "description": "Output template. Supported placeholders: {file}, {lines}, {code}."
+        },
+        "ohMyCopy.includeLineRangeForMultiline": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use line range (e.g. 10-15) when the selection spans multiple lines."
+        },
+        "ohMyCopy.copyCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional shell command to receive the formatted content via stdin. Leave empty to use VS Code clipboard API."
+        },
+        "ohMyCopy.showNotification": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a confirmation notification after copying."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "bun run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "bun run compile && bun run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "package": "vsce package",
+    "publish:vsce": "vsce publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/oh-my-copy.git"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.109.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.7.1",
+    "eslint": "^9.39.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.54.0"
+  }
+}
