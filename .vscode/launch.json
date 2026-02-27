@@ -6,12 +6,26 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Run Extension",
+			"name": "Run Extension (Clean Host)",
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
+				"--disable-extensions",
+				"--disable-extension=google.chrome-devtools-mcp",
+				"--disable-extension=chrome-devtools-mcp",
+				"--disable-extension=google.antigravity",
+				"--disable-extension=antigravity",
+				"--disable-extension=google.antigravity-browser-launcher",
+				"--disable-extension=antigravity-browser-launcher",
+				"--disable-extension=google.antigravity-code-executor",
+				"--disable-extension=antigravity-code-executor",
+				"--user-data-dir=${workspaceFolder}/.antigravity-test/user-data",
+				"--extensions-dir=${workspaceFolder}/.antigravity-test/extensions",
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
+			"env": {
+				"NODE_NO_WARNINGS": "1"
+			},
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
 			],

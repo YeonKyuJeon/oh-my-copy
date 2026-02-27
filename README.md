@@ -5,7 +5,7 @@
 ## Default Output
 
 ```txt
-### src/components/Button.tsx:42-45 const handleClick = () => { // ... }
+### src/components/Button.tsx:42-45 `const handleClick = () => { // ... }`
 ```
 
 Default template:
@@ -27,6 +27,7 @@ Default template:
 
 - `ohMyCopy.outputTemplate`
   - Output template. Placeholders: `{file}`, `{lines}`, `{code}`
+  - `{code}` is inserted wrapped in a template literal (backticks)
 - `ohMyCopy.compactCodeToSingleLine`
   - `true` by default. Collapses multiline/extra spaces into one line before injecting `{code}`
 - `ohMyCopy.enableAntigravityClipboardFallback`

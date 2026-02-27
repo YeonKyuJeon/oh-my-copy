@@ -2,10 +2,10 @@
   "name": "oh-my-copy",
   "displayName": "oh-my-copy",
   "description": "Copy selected code with file and line context for Codex CLI",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "publisher": "oh-my-copy",
   "engines": {
-    "vscode": "^1.109.0"
+    "vscode": "^1.107.0"
   },
   "categories": [
     "Other"
@@ -35,8 +35,8 @@
       "properties": {
         "ohMyCopy.outputTemplate": {
           "type": "string",
-          "default": "### {file}:{lines} {code}\\n",
-          "description": "Output template. Supported placeholders: {file}, {lines}, {code}."
+          "default": "### {file}:{lines} {code}",
+          "description": "Output template. Supported placeholders: {file}, {lines}, {code}. The {code} value is wrapped as a template literal."
         },
         "ohMyCopy.compactCodeToSingleLine": {
           "type": "boolean",
@@ -89,7 +89,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "@types/vscode": "^1.109.0",
+    "@types/vscode": "^1.107.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",

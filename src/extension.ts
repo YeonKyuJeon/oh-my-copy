@@ -51,15 +51,12 @@ export function activate(context: vscode.ExtensionContext) {
       const codeForOutput = config.compactCodeToSingleLine
         ? compactToSingleLine(selectedText)
         : selectedText;
-      let output = formatOutput(config.outputTemplate, {
-        code: codeForOutput,
+      const codeAsTemplateLiteral = wrapAsTemplateLiteral(codeForOutput);
+      const output = formatOutput(config.outputTemplate, {
+        code: codeAsTemplateLiteral,
         file,
         lines,
-      });
-
-      if (!output.endsWith('\n')) {
-        output = `${output}\n`;
-      }
+      }).replace(/[\r\n]+$/, '');
 
       const preferredCopyCommand = resolvePreferredCopyCommand(config);
       const copiedWithCustomCommand = preferredCopyCommand
@@ -110,7 +107,7 @@ function getExtensionConfig(): ExtensionConfig {
     ),
     outputTemplate: config.get<string>(
       'outputTemplate',
-      '### {file}:{lines} {code}\\n'
+      '### {file}:{lines} {code}'
     ),
     showNotification: config.get<boolean>('showNotification', true),
   };
@@ -118,6 +115,12 @@ function getExtensionConfig(): ExtensionConfig {
 
 function compactToSingleLine(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
+}
+
+function wrapAsTemplateLiteral(text: string): string {
+  const escaped = text.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+
+  return `\`${escaped}\``;
 }
 
 function resolvePreferredCopyCommand(config: ExtensionConfig): string {

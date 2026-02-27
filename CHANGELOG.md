@@ -5,6 +5,7 @@
 - Added automatic Antigravity runtime detection
 - Added `ohMyCopy.enableAntigravityClipboardFallback` setting (default `true`)
 - Added `ohMyCopy.antigravityCopyCommand` setting with OS defaults
+- Changed `{code}` output to be wrapped as a template literal
 
 ## 0.1.1
 
