@@ -33,10 +33,10 @@ antigravity --install-extension ./oh-my-copy-<version>.vsix
 
 ```bash
 # VS Code
-code --install-extension ./oh-my-copy-v1.1.1.vsix
+code --install-extension ./oh-my-copy-v1.1.0.vsix
 
 # Antigravity
-antigravity --install-extension ./oh-my-copy-v1.1.1.vsix
+antigravity --install-extension ./oh-my-copy-v1.1.0.vsix
 ```
 
 사용 방법:
