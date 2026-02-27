@@ -1,11 +1,15 @@
 import { spawn } from 'node:child_process';
+import { platform } from 'node:os';
 import { basename } from 'node:path';
 import * as vscode from 'vscode';
 
 const EXTENSION_COMMAND_ID = 'oh-my-copy.copyWithContext';
 
 interface ExtensionConfig {
+  antigravityCopyCommand: string
+  compactCodeToSingleLine: boolean
   copyCommand: string
+  enableAntigravityClipboardFallback: boolean
   includeLineRangeForMultiline: boolean
   outputTemplate: string
   showNotification: boolean
@@ -44,8 +48,11 @@ export function activate(context: vscode.ExtensionContext) {
         selectedText,
         config.includeLineRangeForMultiline
       );
+      const codeForOutput = config.compactCodeToSingleLine
+        ? compactToSingleLine(selectedText)
+        : selectedText;
       let output = formatOutput(config.outputTemplate, {
-        code: selectedText,
+        code: codeForOutput,
         file,
         lines,
       });
@@ -54,8 +61,9 @@ export function activate(context: vscode.ExtensionContext) {
         output = `${output}\n`;
       }
 
-      const copiedWithCustomCommand = config.copyCommand
-        ? await copyWithCommand(config.copyCommand, output)
+      const preferredCopyCommand = resolvePreferredCopyCommand(config);
+      const copiedWithCustomCommand = preferredCopyCommand
+        ? await copyWithCommand(preferredCopyCommand, output)
         : false;
 
       if (!copiedWithCustomCommand) {
@@ -86,17 +94,66 @@ function getExtensionConfig(): ExtensionConfig {
   const config = vscode.workspace.getConfiguration('ohMyCopy');
 
   return {
+    antigravityCopyCommand: config.get<string>('antigravityCopyCommand', '').trim(),
+    compactCodeToSingleLine: config.get<boolean>(
+      'compactCodeToSingleLine',
+      true
+    ),
     copyCommand: config.get<string>('copyCommand', '').trim(),
+    enableAntigravityClipboardFallback: config.get<boolean>(
+      'enableAntigravityClipboardFallback',
+      true
+    ),
     includeLineRangeForMultiline: config.get<boolean>(
       'includeLineRangeForMultiline',
       true
     ),
     outputTemplate: config.get<string>(
       'outputTemplate',
-      '### {file}:{lines}\\n\\n{code}\\n'
+      '### {file}:{lines} {code}\\n'
     ),
     showNotification: config.get<boolean>('showNotification', true),
   };
+}
+
+function compactToSingleLine(text: string): string {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+function resolvePreferredCopyCommand(config: ExtensionConfig): string {
+  if (config.copyCommand) {
+    return config.copyCommand;
+  }
+
+  if (!config.enableAntigravityClipboardFallback || !isAntigravityEditor()) {
+    return '';
+  }
+
+  if (config.antigravityCopyCommand) {
+    return config.antigravityCopyCommand;
+  }
+
+  return getPlatformClipboardCommand();
+}
+
+function isAntigravityEditor(): boolean {
+  const normalized = `${vscode.env.appName} ${vscode.env.uriScheme}`.toLowerCase();
+
+  return normalized.includes('antigravity');
+}
+
+function getPlatformClipboardCommand(): string {
+  const currentPlatform = platform();
+
+  if (currentPlatform === 'darwin') {
+    return 'pbcopy';
+  }
+
+  if (currentPlatform === 'win32') {
+    return 'clip';
+  }
+
+  return 'xclip -selection clipboard';
 }
 
 function getLineLabel(

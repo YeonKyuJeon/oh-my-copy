@@ -2,7 +2,7 @@
   "name": "oh-my-copy",
   "displayName": "oh-my-copy",
   "description": "Copy selected code with file and line context for Codex CLI",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "publisher": "oh-my-copy",
   "engines": {
     "vscode": "^1.109.0"
@@ -35,8 +35,23 @@
       "properties": {
         "ohMyCopy.outputTemplate": {
           "type": "string",
-          "default": "### {file}:{lines}\\n\\n{code}\\n",
+          "default": "### {file}:{lines} {code}\\n",
           "description": "Output template. Supported placeholders: {file}, {lines}, {code}."
+        },
+        "ohMyCopy.compactCodeToSingleLine": {
+          "type": "boolean",
+          "default": true,
+          "description": "Collapse all whitespace in selected code to single spaces before rendering {code}."
+        },
+        "ohMyCopy.enableAntigravityClipboardFallback": {
+          "type": "boolean",
+          "default": true,
+          "description": "If the editor app is Antigravity, prefer shell clipboard command fallback before VS Code clipboard API."
+        },
+        "ohMyCopy.antigravityCopyCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Antigravity-only copy command. If empty, defaults to pbcopy(macOS), clip(Windows), xclip(Linux)."
         },
         "ohMyCopy.includeLineRangeForMultiline": {
           "type": "boolean",

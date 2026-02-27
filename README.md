@@ -5,19 +5,13 @@
 ## Default Output
 
 ```txt
-### src/components/Button.tsx:42-45
-
-const handleClick = () => {
-  // ...
-}
+### src/components/Button.tsx:42-45 const handleClick = () => { // ... }
 ```
 
 Default template:
 
 ```txt
-### {file}:{lines}
-
-{code}
+### {file}:{lines} {code}
 ```
 
 ## Commands
@@ -33,6 +27,13 @@ Default template:
 
 - `ohMyCopy.outputTemplate`
   - Output template. Placeholders: `{file}`, `{lines}`, `{code}`
+- `ohMyCopy.compactCodeToSingleLine`
+  - `true` by default. Collapses multiline/extra spaces into one line before injecting `{code}`
+- `ohMyCopy.enableAntigravityClipboardFallback`
+  - `true` by default. In Antigravity, prefer shell clipboard command fallback
+- `ohMyCopy.antigravityCopyCommand`
+  - Optional Antigravity-specific copy command. If empty:
+  - macOS: `pbcopy`, Windows: `clip`, Linux: `xclip -selection clipboard`
 - `ohMyCopy.includeLineRangeForMultiline`
   - `true` by default. Uses `start-end` for multiline selections
 - `ohMyCopy.copyCommand`
@@ -40,6 +41,10 @@ Default template:
   - Leave empty to use VS Code clipboard API directly
 - `ohMyCopy.showNotification`
   - Show success message after copying
+
+## Antigravity Support
+
+When running in Antigravity (app name contains `antigravity`), `oh-my-copy` can use shell clipboard fallback automatically. This helps environments where `vscode.env.clipboard` behaves differently.
 
 ## Development
 
