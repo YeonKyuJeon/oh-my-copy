@@ -1,6 +1,28 @@
 # oh-my-copy
 
-`oh-my-copy` is a VS Code extension that copies your selected code with file/line context for external tools like Codex CLI.
+`oh-my-copy` is a VS Code extension that copies selected code with file/line context for external tools like Codex CLI.
+
+## Install
+
+### 1) VS Code Marketplace (recommended)
+
+- Install from Marketplace: https://marketplace.visualstudio.com/items?itemName=oh-my-copy.oh-my-copy
+
+### 2) GitHub Release VSIX (works without Marketplace)
+
+1. Open Releases: https://github.com/YeonKyuJeon/oh-my-copy/releases
+2. Download `oh-my-copy-<version>.vsix`
+3. Install the VSIX:
+
+```bash
+code --install-extension ./oh-my-copy-<version>.vsix
+```
+
+For Antigravity:
+
+```bash
+antigravity --install-extension ./oh-my-copy-<version>.vsix
+```
 
 ## Default Output
 
@@ -20,7 +42,7 @@ Default template:
 
 ## Default Keybinding
 
-- macOS: `ctrl+cmd+c`
+- macOS: `ctrl+cmd+alt+c`
 - Windows/Linux: `ctrl+alt+c`
 
 ## Settings
@@ -45,7 +67,7 @@ Default template:
 
 ## Antigravity Support
 
-When running in Antigravity (app name contains `antigravity`), `oh-my-copy` can use shell clipboard fallback automatically. This helps environments where `vscode.env.clipboard` behaves differently.
+When running in Antigravity (app name contains `antigravity`), `oh-my-copy` can use shell clipboard fallback automatically.
 
 ## Development
 
@@ -61,15 +83,10 @@ bun run watch
 bun run package
 ```
 
-This creates a `.vsix` package using `vsce`.
+## Manual Install (No Marketplace)
 
-## Publish to GitHub
+- [MANUAL_INSTALL.md](./MANUAL_INSTALL.md)
 
-```bash
-git init
-git add .
-git commit -m "feat: init oh-my-copy extension"
-git branch -M main
-git remote add origin <your-github-repo-url>
-git push -u origin main
-```
+## Release (Maintainers)
+
+- [RELEASE.md](./RELEASE.md)
