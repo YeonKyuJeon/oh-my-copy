@@ -94,16 +94,18 @@ antigravity --uninstall-extension oh-my-copy.oh-my-copy
 
 ## 6. 설치 확인
 
-1. Command Palette에서 `Oh My Copy: Copy With Context` 검색
+1. Command Palette에서 아래 명령 중 하나 검색
+   - `Oh My Copy: Copy With Context` (상대경로)
+   - `Oh My Copy: Copy With Absolute Context` (절대경로)
 2. 코드 선택 후 단축키 실행
-   - macOS: `ctrl+cmd+alt+c`
-   - Windows/Linux: `ctrl+alt+c`
+   - 상대경로: macOS `ctrl+cmd+alt+c`, Windows/Linux `ctrl+alt+c`
+   - 절대경로: macOS `ctrl+cmd+alt+d`, Windows/Linux `ctrl+alt+d`
 3. 외부 도구(Codex CLI 등)에 붙여넣기
 
 출력 예시:
 
 ```txt
-### src/components/Button.tsx:42-45 `const handleClick = () => { // ... }`
+FILE: src/components/Button.tsx:42-45
 ```
 
 ## 7. 팀 공유 권장 방식

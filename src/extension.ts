@@ -4,13 +4,15 @@ import { basename } from 'node:path';
 import * as vscode from 'vscode';
 
 const EXTENSION_COMMAND_ID = 'oh-my-copy.copyWithContext';
+const EXTENSION_ABSOLUTE_COMMAND_ID = 'oh-my-copy.copyWithAbsoluteContext';
+const DEFAULT_CONTEXT_PREFIX = 'FILE:';
 
 interface ExtensionConfig {
   antigravityCopyCommand: string
   compactCodeToSingleLine: boolean
+  contextPrefix: string
   copyCommand: string
   enableAntigravityClipboardFallback: boolean
-  includeLineRangeForMultiline: boolean
   outputTemplate: string
   showNotification: boolean
 }
@@ -19,69 +21,39 @@ interface TemplateValues {
   code: string
   file: string
   lines: string
+  prefix: string
+}
+
+interface SelectionLineBounds {
+  end: number
+  start: number
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  const disposable = vscode.commands.registerCommand(
+  const copyWithContextDisposable = vscode.commands.registerCommand(
     EXTENSION_COMMAND_ID,
     async () => {
-      const editor = vscode.window.activeTextEditor;
-
-      if (!editor) {
-        await vscode.window.showWarningMessage('No active editor found.');
-        return;
-      }
-
-      const selectedText = editor.document.getText(editor.selection);
-
-      if (!selectedText.trim()) {
-        await vscode.window.showWarningMessage(
-          'Select code before running Oh My Copy.'
-        );
-        return;
-      }
-
-      const config = getExtensionConfig();
-      const file = getRelativeFilePath(editor.document.uri);
-      const lines = getLineLabel(
-        editor.selection,
-        selectedText,
-        config.includeLineRangeForMultiline
-      );
-      const codeForOutput = config.compactCodeToSingleLine
-        ? compactToSingleLine(selectedText)
-        : selectedText;
-      const codeAsTemplateLiteral = wrapAsTemplateLiteral(codeForOutput);
-      const output = formatOutput(config.outputTemplate, {
-        code: codeAsTemplateLiteral,
-        file,
-        lines,
-      }).replace(/[\r\n]+$/, '');
-
-      const preferredCopyCommand = resolvePreferredCopyCommand(config);
-      const copiedWithCustomCommand = preferredCopyCommand
-        ? await copyWithCommand(preferredCopyCommand, output)
-        : false;
-
-      if (!copiedWithCustomCommand) {
-        await vscode.env.clipboard.writeText(output);
-      }
-
-      if (config.showNotification) {
-        await vscode.window.showInformationMessage(
-          'Copied selection with context to clipboard.'
-        );
-      }
+      await copyWithEditorContext(false);
+    }
+  );
+  const copyWithAbsoluteContextDisposable = vscode.commands.registerCommand(
+    EXTENSION_ABSOLUTE_COMMAND_ID,
+    async () => {
+      await copyWithEditorContext(true);
     }
   );
 
-  context.subscriptions.push(disposable);
+  context.subscriptions.push(
+    copyWithContextDisposable,
+    copyWithAbsoluteContextDisposable
+  );
 }
 
 export function deactivate() {}
 
 function formatOutput(template: string, values: TemplateValues): string {
   return template
+    .replaceAll('{prefix}', values.prefix)
     .replaceAll('{file}', values.file)
     .replaceAll('{lines}', values.lines)
     .replaceAll('{code}', values.code);
@@ -96,21 +68,97 @@ function getExtensionConfig(): ExtensionConfig {
       'compactCodeToSingleLine',
       true
     ),
+    contextPrefix: getContextPrefix(
+      config.get<string>('contextPrefix', DEFAULT_CONTEXT_PREFIX)
+    ),
     copyCommand: config.get<string>('copyCommand', '').trim(),
     enableAntigravityClipboardFallback: config.get<boolean>(
       'enableAntigravityClipboardFallback',
       true
     ),
-    includeLineRangeForMultiline: config.get<boolean>(
-      'includeLineRangeForMultiline',
-      true
-    ),
     outputTemplate: config.get<string>(
       'outputTemplate',
-      '### {file}:{lines} {code}'
+      '{prefix} {file}:{lines} {code}'
     ),
     showNotification: config.get<boolean>('showNotification', true),
   };
+}
+
+async function copyWithEditorContext(useAbsolutePath: boolean): Promise<void> {
+  const editor = vscode.window.activeTextEditor;
+
+  if (!editor) {
+    await vscode.window.showWarningMessage('No active editor found.');
+    return;
+  }
+
+  const config = getExtensionConfig();
+  const file = getFilePath(editor.document.uri, useAbsolutePath);
+  let output = formatOutput('{prefix} {file}', {
+    code: '',
+    file,
+    lines: '',
+    prefix: config.contextPrefix,
+  });
+  let notificationMessage = 'Copied file path to clipboard.';
+
+  if (!editor.selection.isEmpty) {
+    const selectedText = editor.document.getText(editor.selection);
+
+    if (!selectedText.trim()) {
+      await vscode.window.showWarningMessage(
+        'Select code before running Oh My Copy.'
+      );
+      return;
+    }
+
+    const selectionLineBounds = getSelectionLineBounds(
+      editor.selection,
+      selectedText
+    );
+    const lines = getLineLabel(selectionLineBounds);
+    const isSingleLineSelection =
+      selectionLineBounds.start === selectionLineBounds.end;
+    const codeForOutput = config.compactCodeToSingleLine
+      ? compactToSingleLine(selectedText)
+      : selectedText;
+    const codeAsTemplateLiteral = wrapAsTemplateLiteral(codeForOutput);
+    // For multiline selections, only send location context to reduce prompt noise.
+    const template = isSingleLineSelection
+      ? config.outputTemplate
+      : '{prefix} {file}:{lines}';
+
+    output = formatOutput(template, {
+      code: isSingleLineSelection ? codeAsTemplateLiteral : '',
+      file,
+      lines,
+      prefix: config.contextPrefix,
+    }).trimEnd();
+    notificationMessage = 'Copied file context to clipboard.';
+  }
+
+  const preferredCopyCommand = resolvePreferredCopyCommand(config);
+  const copiedWithCustomCommand = preferredCopyCommand
+    ? await copyWithCommand(preferredCopyCommand, output)
+    : false;
+
+  if (!copiedWithCustomCommand) {
+    await vscode.env.clipboard.writeText(output);
+  }
+
+  if (config.showNotification) {
+    await vscode.window.showInformationMessage(notificationMessage);
+  }
+}
+
+function getContextPrefix(prefix: string): string {
+  const normalized = prefix.trim();
+
+  if (!normalized) {
+    return DEFAULT_CONTEXT_PREFIX;
+  }
+
+  return normalized;
 }
 
 function compactToSingleLine(text: string): string {
@@ -159,11 +207,18 @@ function getPlatformClipboardCommand(): string {
   return 'xclip -selection clipboard';
 }
 
-function getLineLabel(
+function getLineLabel(bounds: SelectionLineBounds): string {
+  if (bounds.start === bounds.end) {
+    return bounds.start.toString();
+  }
+
+  return `${bounds.start}-${bounds.end}`;
+}
+
+function getSelectionLineBounds(
   selection: vscode.Selection,
-  selectedText: string,
-  includeLineRangeForMultiline: boolean
-): string {
+  selectedText: string
+): SelectionLineBounds {
   const startLine = selection.start.line + 1;
   let endLine = selection.end.line + 1;
 
@@ -179,11 +234,10 @@ function getLineLabel(
     endLine = startLine;
   }
 
-  if (!includeLineRangeForMultiline || startLine === endLine) {
-    return startLine.toString();
-  }
-
-  return `${startLine}-${endLine}`;
+  return {
+    end: endLine,
+    start: startLine,
+  };
 }
 
 function getRelativeFilePath(uri: vscode.Uri): string {
@@ -194,6 +248,14 @@ function getRelativeFilePath(uri: vscode.Uri): string {
   }
 
   return vscode.workspace.asRelativePath(uri, false);
+}
+
+function getFilePath(uri: vscode.Uri, useAbsolutePath: boolean): string {
+  if (useAbsolutePath) {
+    return uri.fsPath;
+  }
+
+  return getRelativeFilePath(uri);
 }
 
 async function copyWithCommand(command: string, content: string): Promise<boolean> {

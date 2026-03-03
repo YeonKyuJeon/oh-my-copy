@@ -1,8 +1,8 @@
 {
   "name": "oh-my-copy",
   "displayName": "oh-my-copy",
-  "description": "Copy selected code with file and line context for Codex CLI",
-  "version": "1.1.0",
+  "description": "Copy selected code with file/line context, or copy only the file path when no selection",
+  "version": "1.2.2",
   "publisher": "oh-my-copy",
   "engines": {
     "vscode": "^1.107.0"
@@ -11,7 +11,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:oh-my-copy.copyWithContext"
+    "onCommand:oh-my-copy.copyWithContext",
+    "onCommand:oh-my-copy.copyWithAbsoluteContext"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -20,6 +21,11 @@
         "command": "oh-my-copy.copyWithContext",
         "title": "Copy With Context",
         "category": "Oh My Copy"
+      },
+      {
+        "command": "oh-my-copy.copyWithAbsoluteContext",
+        "title": "Copy With Absolute Context",
+        "category": "Oh My Copy"
       }
     ],
     "keybindings": [
@@ -27,7 +33,13 @@
         "command": "oh-my-copy.copyWithContext",
         "key": "ctrl+alt+c",
         "mac": "ctrl+cmd+alt+c",
-        "when": "editorTextFocus && editorHasSelection && !terminalFocus"
+        "when": "editorTextFocus && !terminalFocus"
+      },
+      {
+        "command": "oh-my-copy.copyWithAbsoluteContext",
+        "key": "ctrl+alt+d",
+        "mac": "ctrl+cmd+alt+d",
+        "when": "editorTextFocus && !terminalFocus"
       }
     ],
     "configuration": {
@@ -35,13 +47,18 @@
       "properties": {
         "ohMyCopy.outputTemplate": {
           "type": "string",
-          "default": "### {file}:{lines} {code}",
-          "description": "Output template. Supported placeholders: {file}, {lines}, {code}. The {code} value is wrapped as a template literal."
+          "default": "{prefix} {file}:{lines} {code}",
+          "description": "Output template for single-line selections. Supported placeholders: {prefix}, {file}, {lines}, {code}. Use `{prefix}` to apply `ohMyCopy.contextPrefix`. The {code} value is wrapped as a template literal."
+        },
+        "ohMyCopy.contextPrefix": {
+          "type": "string",
+          "default": "FILE:",
+          "description": "Context prefix label (for example `FILE:`, `CTX:`, `PATH:`). Used for no-selection output (`{prefix} {file}`), multiline output (`{prefix} {file}:{lines}`), and single-line output when `{prefix}` is used in `ohMyCopy.outputTemplate`."
         },
         "ohMyCopy.compactCodeToSingleLine": {
           "type": "boolean",
           "default": true,
-          "description": "Collapse all whitespace in selected code to single spaces before rendering {code}."
+          "description": "Collapse all whitespace in selected code to single spaces before rendering {code} in single-line output."
         },
         "ohMyCopy.enableAntigravityClipboardFallback": {
           "type": "boolean",
@@ -52,11 +69,6 @@
           "type": "string",
           "default": "",
           "description": "Optional Antigravity-only copy command. If empty, defaults to pbcopy(macOS), clip(Windows), xclip(Linux)."
-        },
-        "ohMyCopy.includeLineRangeForMultiline": {
-          "type": "boolean",
-          "default": true,
-          "description": "Use line range (e.g. 10-15) when the selection spans multiple lines."
         },
         "ohMyCopy.copyCommand": {
           "type": "string",
